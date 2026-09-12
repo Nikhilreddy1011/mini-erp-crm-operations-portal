@@ -1,0 +1,156 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  SALES
+  WAREHOUSE
+  ACCOUNTS
+}
+
+enum CustomerType {
+  RETAIL
+  WHOLESALE
+  DISTRIBUTOR
+}
+
+enum CustomerStatus {
+  LEAD
+  ACTIVE
+  INACTIVE
+}
+
+enum MovementType {
+  IN
+  OUT
+}
+
+enum ChallanStatus {
+  DRAFT
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(SALES)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  customersCreated Customer[]         @relation("UserCustomers")
+  followUpsCreated CustomerFollowUp[] @relation("UserFollowUps")
+  stockMovements   StockMovement[]    @relation("UserStockMovements")
+  challansCreated  SalesChallan[]     @relation("UserChallans")
+}
+
+model Customer {
+  id           String         @id @default(uuid())
+  customerName String
+  mobileNumber String
+  email        String
+  businessName String
+  gstNumber    String?
+  customerType CustomerType   @default(RETAIL)
+  address      String
+  status       CustomerStatus @default(LEAD)
+  followUpDate DateTime?
+  notes        String?
+  createdBy    String
+  creator      User           @relation("UserCustomers", fields: [createdBy], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  followUps CustomerFollowUp[]
+  challans  SalesChallan[]
+
+  @@index([mobileNumber])
+  @@index([email])
+  @@index([status])
+  @@index([customerType])
+  @@index([createdAt])
+}
+
+model CustomerFollowUp {
+  id           String    @id @default(uuid())
+  customerId   String
+  customer     Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  note         String
+  followUpDate DateTime?
+  createdBy    String
+  creator      User      @relation("UserFollowUps", fields: [createdBy], references: [id])
+  createdAt    DateTime  @default(now())
+}
+
+model Product {
+  id                        String   @id @default(uuid())
+  name                      String
+  sku                       String   @unique
+  category                  String
+  unitPrice                 Float
+  currentStock              Int      @default(0)
+  minimumStockAlertQuantity Int      @default(10)
+  warehouseLocation         String
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  stockMovements StockMovement[]
+  challanItems   SalesChallanItem[]
+
+  @@index([sku])
+  @@index([category])
+  @@index([createdAt])
+}
+
+model StockMovement {
+  id              String       @id @default(uuid())
+  productId       String
+  product         Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantityChanged Int
+  movementType    MovementType
+  reason          String
+  createdBy       String
+  creator         User         @relation("UserStockMovements", fields: [createdBy], references: [id])
+  createdAt       DateTime     @default(now())
+}
+
+model SalesChallan {
+  id            String        @id @default(uuid())
+  challanNumber String        @unique
+  customerId    String
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  totalQuantity Int
+  status        ChallanStatus @default(DRAFT)
+  createdBy     String
+  creator       User          @relation("UserChallans", fields: [createdBy], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  items SalesChallanItem[]
+
+  @@index([challanNumber])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model SalesChallanItem {
+  id                  String       @id @default(uuid())
+  challanId           String
+  challan             SalesChallan @relation(fields: [challanId], references: [id], onDelete: Cascade)
+  productId           String
+  product             Product      @relation(fields: [productId], references: [id])
+  productNameSnapshot String
+  skuSnapshot         String
+  unitPriceSnapshot   Float
+  quantity            Int
+  lineTotal           Float
+}
