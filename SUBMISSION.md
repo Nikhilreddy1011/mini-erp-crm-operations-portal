@@ -4,12 +4,12 @@
 
 | Item | Current value |
 |---|---|
-| GitHub repository | Not published from this workspace. No Git remote is configured. |
-| Live frontend | Local verified URL: http://localhost:5173 |
-| Live backend API | Local verified URL: http://localhost:5000 |
-| Backend health check | http://localhost:5000/health |
+| GitHub repository | https://github.com/Nikhilreddy1011/mini-erp-crm-operations-portal |
+| Live frontend | https://mini-erp-crm-operations-portal-1-14zw.onrender.com |
+| Live backend API | https://mini-erp-crm-operations-portal-efdf.onrender.com |
+| Backend health check | https://mini-erp-crm-operations-portal-efdf.onrender.com/health |
 | Postman collection | [postman_collection.json](postman_collection.json) |
-| Architecture and API documentation | [CASE_STUDY.md](CASE_STUDY.md) |
+| Architecture and API documentation | [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) and [CASE_STUDY.md](CASE_STUDY.md) |
 | Setup and deployment instructions | [README.md](README.md) |
 
 Cloud deployment requires publishing the repository and configuring the hosting provider credentials. The project is prepared for a static frontend host such as Vercel, Netlify, or Render Static Site; a Node backend host such as Render, Railway, or Fly.io; and PostgreSQL from Supabase, Neon, Render Postgres, or another compatible provider.
@@ -52,11 +52,10 @@ The collection covers authentication, profile access, customer CRM, products, in
 
 ## Known Limitations
 
-- The repository has not been pushed to GitHub from this workspace, so no public repository URL is available yet.
-- The app is not deployed to a public frontend or backend host yet; the URLs above are local development URLs.
+- The frontend and backend are deployed on Render using the production URLs listed above.
 - The demo seed script clears existing application data before inserting demo records. Do not run it against production data.
 - The frontend uses local storage for the JWT token; production deployments should use HTTPS and review token/session policy before exposing the application publicly.
-- Cloud infrastructure, domain configuration, TLS, backups, monitoring, and CI/CD are not included in this local submission.
+- Cloud infrastructure is hosted on Render and Neon; backups, monitoring, custom domains, and CI/CD hardening are outside this submission scope.
 
 ## Cloud Publish Checklist
 
